@@ -44,14 +44,22 @@ This application helps students and job seekers discover career options that ali
 ## 📦 Folder Structure
 
 career-recommender-app/
+
 │
 ├── client/ # React frontend
+
 │ ├── App.js
+
 │ ├── App.css
+
 │ └── ...
 │
 ├── server/ # Flask backend
+
 │ └── app.py
+
 │
 ├── README.md
+
 └── requirements.txt
+
