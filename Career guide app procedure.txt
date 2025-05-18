@@ -1,0 +1,477 @@
+--> Career guide app:
+
+
+1. Introduction (30s)
+(Screen share: App interface or code root folder)
+
+"Hi, I'm Lavanya, and this is my project called Career Guide App.
+It’s a web-based tool that helps users discover professional career paths based on their interests.
+
+I built this using React for the frontend and Flask (Python) for the backend, making it a full-stack application.
+This app is designed to give users relevant career suggestions like yoga trainer, singer, chef, teacher, etc., just by entering what they’re passionate about."
+
+2. Frontend Overview (React) (1 min)
+(Screen share: client/src/App.js, then UI preview)
+
+"The frontend is created using React.
+In the App.js file, I have a simple component that handles user input and sends a POST request to the backend API.
+
+When a user enters their interests and clicks the button, it calls the Flask backend and displays career suggestions dynamically.
+
+I’ve used useState to manage the input and output, and styled the UI using CSS for a colorful, engaging user experience.
+The UI includes icons, gradients, shadows, and animations to make it visually appealing and user-friendly."
+
+3. Backend Overview (Flask) (1 min)
+(Screen share: server/app.py)
+
+"The backend is powered by Flask.
+In app.py, I’ve created a /recommend endpoint which receives the interests and returns career suggestions.
+
+I’ve implemented a simple keyword-matching logic using a dictionary that maps interests like teaching or dancing to relevant professions.
+It also returns general career ideas if no keyword is matched.
+
+To allow communication between React and Flask, I’ve used flask-cors."
+
+4. Design & Architecture (45s)
+(Show folder structure and code separation)
+
+"The project is structured with clear separation — client for React and server for Flask.
+
+This makes the app modular and scalable.
+The backend could later be extended with a database or ML model, and the frontend can grow with routing or authentication.
+
+I chose this architecture because it keeps the code clean and allows independent deployment if needed."
+
+5. Challenges & Solutions (45s)
+(Be real here – it adds depth!)
+
+"One challenge I faced was setting up the frontend and backend communication across different ports — solved using CORS.
+Another was designing a UI that's both simple and attractive, especially as a beginner — so I focused on clean CSS and responsive design."
+
+6. Features Added + Improvements (30s)
+(Highlight commits or describe files updated)
+
+"I added career suggestions for multiple interest domains like yoga, chef, singing, and dancing, and expanded the backend logic to support that.
+If I had more time, I would integrate a database to store user feedback, and maybe use a pretrained model for smarter recommendations."
+
+7. Deployment (optional, if done)
+(If hosted: show Vercel/Render URL)
+
+"This app can easily be deployed using Vercel for frontend and Render for backend, with environment variables and production APIs."
+
+8. Outro (15s)
+(Facecam or screen with project open)
+
+"Thank you for watching!
+This was my Career Guide App built using React and Flask.
+I hope you found it useful — I’m excited to keep improving it and building more full-stack apps."
+
+
+==========================================================================
+
+
+### README.md (Documentation)
+
+# AI Career Recommender (React + Flask)
+
+A simple full-stack web application that recommends career paths based on user interests using a Flask backend and a React frontend.
+
+## 🌟 Features
+- Input-based career recommendation
+- Simple keyword rule-based logic
+- Clean React frontend with API integration
+- Flask API for backend processing
+
+## 🛠️ Technologies Used
+- React (Frontend)
+- Flask + Flask-CORS (Backend)
+- Axios (API calls)
+
+## 🚀 Running the Project
+
+### Backend (Flask)
+```bash
+cd server
+pip install flask flask-cors
+python app.py
+```
+
+### Frontend (React)
+```bash
+cd client
+npm install
+npm start
+```
+
+Ensure Flask is running at `http://localhost:5000` before starting the React frontend.
+
+## 📹 Loom Walkthrough Script
+
+"Hi, I’m Lavanya, and this is my project – an AI Career Recommender built using React and Flask."
+
+1. **Introduction**:
+   - Purpose: To guide students in choosing a career path based on their interests.
+
+2. **Frontend**:
+   - Built with React. The user inputs their interests.
+   - Uses Axios to send a POST request to Flask.
+   - Displays a list of careers returned by the backend.
+
+3. **Backend**:
+   - Built with Flask and Flask-CORS.
+   - Contains a single endpoint `/recommend` that uses simple keyword matching.
+
+4. **Design Choices**:
+   - Decoupled frontend/backend for flexibility.
+   - Rule-based logic for simplicity and fast execution.
+
+5. **Challenges**:
+   - Ensuring smooth CORS handling.
+   - Connecting Axios to the Flask endpoint correctly.
+
+6. **Possible Improvements**:
+   - Add a database to store user queries.
+   - Replace rule-based logic with a trained ML model.
+   - Deploy on Render (backend) and Netlify/Vercel (frontend).
+
+"Thank you for watching. I hope you found this project interesting!"
+
+
+================================================================================
+
+
+> App.js
+
+import React, { useState } from 'react';
+import axios from 'axios';
+import './App.css'; // Import the CSS file
+
+export default function App() {
+  const [input, setInput] = useState('');
+  const [careers, setCareers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async () => {
+    if (!input.trim()) {
+      setError('Please enter your interests to get suggestions!');
+      setCareers([]);
+      return;
+    }
+    setError('');
+    setLoading(true);
+    setCareers([]);
+    try {
+      const res = await axios.post('http://localhost:5000/recommend', {
+        interests: input,
+      });
+      setCareers(res.data.careers);
+    } catch (err) {
+      setError('Oops! Something went wrong. Please try again.');
+    }
+    setLoading(false);
+  };
+
+  const handleReset = () => {
+    setInput('');
+    setCareers([]);
+    setError('');
+  };
+
+  return (
+    <div className="page">
+      <h1 className="title">🎯 Career Recommender</h1>
+      <p className="subtitle">Tell us your interests and get professional career path optins!</p>
+
+      <textarea
+        rows={3}
+        placeholder="E.g., I love teaching, yoga, and data analysis"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        className="textarea"
+        disabled={loading}
+      />
+
+      <div className="buttons">
+        <button onClick={handleSubmit} disabled={loading} className="button-primary">
+          {loading ? <div className="loader"></div> : 'Get Suggestions'}
+        </button>
+        <button onClick={handleReset} disabled={loading} className="button-secondary">
+          Reset
+        </button>
+      </div>
+
+      {error && <p className="error">{error}</p>}
+
+      {careers.length > 0 && (
+        <div className="results-container">
+          {careers.map((career, i) => (
+            <div key={i} className="career-card">
+              <h3>{career}</h3>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+-------------------------------------------------
+
+> App.py
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    data = request.json
+    interests = data.get('interests', '').lower()
+
+    if 'design' in interests:
+        careers = [
+            'UI/UX Designer',
+            'Graphic Designer',
+            'Product Designer',
+            'Motion Graphics Designer',
+            'Interior Designer'
+        ]
+    elif 'data' in interests or 'analytics' in interests:
+        careers = [
+            'Data Analyst',
+            'Data Scientist',
+            'Machine Learning Engineer',
+            'Business Intelligence Analyst',
+            'Statistician'
+        ]
+    elif 'code' in interests or 'software' in interests or 'developer' in interests:
+        careers = [
+            'Software Engineer',
+            'Backend Developer',
+            'Full Stack Developer',
+            'Mobile App Developer',
+            'DevOps Engineer'
+        ]
+    elif 'business' in interests or 'management' in interests or 'marketing' in interests:
+        careers = [
+            'Business Analyst',
+            'Product Manager',
+            'Digital Marketing Specialist',
+            'Sales Executive',
+            'HR Manager'
+        ]
+    elif 'finance' in interests or 'accounting' in interests or 'investment' in interests:
+        careers = [
+            'Financial Analyst',
+            'Accountant',
+            'Investment Banker',
+            'Auditor',
+            'Risk Manager'
+        ]
+    elif 'health' in interests or 'medicine' in interests or 'biology' in interests:
+        careers = [
+            'Medical Researcher',
+            'Healthcare Administrator',
+            'Pharmacist',
+            'Nurse',
+            'Physiotherapist'
+        ]
+    elif 'teaching' in interests or 'education' in interests or 'tutor' in interests:
+        careers = [
+            'School Teacher',
+            'College Lecturer',
+            'Corporate Trainer',
+            'Online Educator',
+            'Education Consultant'
+        ]
+    elif 'dancing' in interests or 'dance' in interests:
+        careers = [
+            'Professional Dancer',
+            'Choreographer',
+            'Dance Instructor',
+            'Dance Therapist',
+            'Performing Artist'
+        ]
+    elif 'yoga' in interests:
+        careers = [
+            'Yoga Instructor',
+            'Wellness Coach',
+            'Physical Therapist',
+            'Meditation Trainer',
+            'Health Consultant'
+        ]
+    elif 'singing' in interests or 'singer' in interests or 'music' in interests:
+        careers = [
+            'Professional Singer',
+            'Music Teacher',
+            'Voice Trainer',
+            'Music Therapist',
+            'Sound Engineer'
+        ]
+    elif 'chef' in interests or 'cooking' in interests or 'culinary' in interests:
+        careers = [
+            'Professional Chef',
+            'Pastry Chef',
+            'Food Critic',
+            'Culinary Instructor',
+            'Restaurant Manager'
+        ]
+    else:
+        careers = [
+            'Software Engineer',
+            'Content Creator',
+            'Technical Writer',
+            'Consultant',
+            'Entrepreneur'
+        ]
+
+    return jsonify({'careers': careers})
+
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0', debug=True)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+----------------------------------------
+
+> App.css
+
+/* App.css */
+
+.page {
+  max-width: 480px;
+  margin: 3rem auto;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #72EDF2 10%, #5151E5 100%);
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+.textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: none;
+  padding: 15px;
+  font-size: 1.1rem;
+  resize: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  outline: none;
+  margin-bottom: 15px;
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.button-primary {
+  flex: 1;
+  background-color: #3498db;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(52, 152, 219, 0.6);
+  transition: background-color 0.3s ease;
+}
+
+.button-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  flex: 1;
+  background-color: #ecf0f1;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  color: #34495e;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(236, 240, 241, 0.6);
+  transition: background-color 0.3s ease;
+}
+
+.button-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #ff6b6b;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 15px;
+  text-shadow: 0 0 5px #ff6b6b;
+}
+
+.results-container {
+  margin-top: 15px;
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.career-card {
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 18px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: white;
+  user-select: none;
+  transition: transform 0.2s ease;
+  cursor: default;
+}
+
+.career-card:hover {
+  transform: scale(1.05);
+}
+
+/* Loader spinner */
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+
